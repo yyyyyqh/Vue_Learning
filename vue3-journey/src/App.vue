@@ -1,42 +1,46 @@
 <script setup lang="ts">
-// 1. 导入 Vue 3 的核心功能 `ref`
-// `ref` 用于创建一个响应式的数据源
-import { ref } from 'vue'
+// 1. 引入 ref 和我们刚创建的 TodoItem 组件
+import { ref } from "vue";
+import TodoItem from "./components/TodoItem.vue";
 
-// 2. 创建一个名为 `count` 的响应式变量，初始值为 0
-const count = ref(0)
+// 2. 创建一个响应式的待办事项列表
+const todos = ref([
+  { id: 1, text: "学习 Vue Props" },
+  { id: 2, text: "学习 Vue Emits" },
+  { id: 3, text: "学习 v-for 列表渲染" },
+  { id: 4, text: "征服星辰大海！" },
+]);
 
-// 3. 创建一个函数，用于增加 count 的值
-function increment() {
-  // 在 <script> 中，我们需要通过 .value 来访问和修改 ref 的值
-  count.value++
+// 3. 创建一个函数，用于接收子组件传来的 id 并删除对应的待办事项
+function removeTodo(idToRemove: number) {
+  todos.value = todos.value.filter((todo) => todo.id != idToRemove);
 }
 </script>
 
 <template>
   <main>
-    <h1>我的第一次 Vue 3 创造之旅！</h1>
-    
-    <button @click="increment">
-      当前点击次数：{{ count }}
-    </button>
+    <h1>我的待办事项</h1>
+    <ul>
+      <TodoItem
+        v-for="todo in todos"
+        :key="todo.id"
+        :todo="todo"
+        @remove1="removeTodo(todo.id)"
+      />
+    </ul>
   </main>
 </template>
 
 <style scoped>
 main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  text-align: center;
+  width: 100%;
+  max-width: 500px;
+  margin: 40px auto;
+  font-family: sans-serif;
 }
 
-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 1.2rem;
-  cursor: pointer;
+ul {
+  list-style: none;
+  padding: 0;
 }
 </style>
