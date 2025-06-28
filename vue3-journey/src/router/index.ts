@@ -14,10 +14,17 @@ const router = createRouter({
     {
       path: "/about",
       name: "about",
-      // 这是“路由懒加载”，只有当用户访问 /about 时，才会加载这个组件
-      // 对于大型应用能优化初始加载速度
       component: () => import("../views/AboutView.vue"),
     },
+    // --- 新增部分 开始 ---
+    // 这就是动态路由
+    // `:id` 是一个动态参数，它可以匹配任何字符串
+    {
+      path: "/todo/:id",
+      name: "TodoDetail",
+      component: () => import("../views/TodoDetailView.vue"),
+    },
+    // --- 新增部分 结束 ---
   ],
 });
 

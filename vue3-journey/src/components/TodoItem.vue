@@ -19,7 +19,10 @@ const emit = defineEmits(["remove", "toggle-complete"]);
       :checked="todo.completed"
       @change="emit('toggle-complete')"
     />
-    <span>{{ todo.text }}</span>
+
+    <RouterLink :to="`/todo/${todo.id}`">
+      <span>{{ todo.text }}</span>
+    </RouterLink>
     <button @click="emit('remove')">删除</button>
   </li>
 </template>
