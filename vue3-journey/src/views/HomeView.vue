@@ -1,73 +1,41 @@
-<script setup lang="ts">
-// 1. 从 vue 中再多导入一个 `computed`
-import { ref, watch, computed } from "vue";
-// import TodoItem from "./components/TodoItem.vue";
-import TodoItem from "@/components/TodoItem.vue";
+// src/views/HomeView.vue
 
+<script setup lang="ts">
+import { ref } from "vue";
+import TodoItem from "../components/TodoItem.vue";
+// 1. 导入我们刚刚创建的 store
+import { useTodoStore } from "../stores/todoStore";
+
+// 2. 在组件中激活 store
+const todoStore = useTodoStore();
+
+// 3. 输入框的文本是这个组件独有的临时状态，所以保留在组件本地
 const newTodoText = ref("");
 
-// 2. 更新数据结构，为每个 todo 项增加 `completed` 属性
-const todos = ref(JSON.parse(localStorage.getItem("todos") || "[]"));
-
-watch(
-  todos,
-  (newTodos) => {
-    localStorage.setItem("todos", JSON.stringify(newTodos));
-  },
-  { deep: true }
-);
-
-// 3. ✨ 这是我们的计算属性 ✨
-//    它会根据 `todos` 列表自动计算出未完成项的数量
-const incompleteCount = computed(() => {
-  // .filter 会返回一个新数组，这里是所有 completed 为 false 的项
-  return todos.value.filter((todo) => !todo.completed).length;
-});
-
-function removeTodo(idToRemove: number) {
-  todos.value = todos.value.filter((todo) => todo.id !== idToRemove);
-}
-
-function addTodo() {
-  const trimmedText = newTodoText.value.trim();
-  if (trimmedText === "") return;
-
-  const newTodo = {
-    id: Date.now(),
-    text: trimmedText,
-    completed: false, // 新增的 todo 默认是未完成状态
-  };
-  todos.value.unshift(newTodo);
+// 4. 创建一个新函数来调用 store 里的 action
+function addNewTodo() {
+  todoStore.addTodo(newTodoText.value);
+  // 清空本地的 ref
   newTodoText.value = "";
-}
-
-// 4. 新增一个方法，用于切换 todo 的完成状态
-function toggleTodoComplete(idToToggle: number) {
-  // 找到我们要修改的那个 todo
-  const todo = todos.value.find((todo) => todo.id === idToToggle);
-  if (todo) {
-    // 直接修改它的 completed 属性
-    todo.completed = !todo.completed;
-  }
 }
 </script>
 
 <template>
   <main>
-    <h1>我的待办事项 (还剩 {{ incompleteCount }} 项未完成)</h1>
+    <h1>我的待办事项 (还剩 {{ todoStore.incompleteCount }} 项未完成)</h1>
 
-    <form @submit.prevent="addTodo">
+    <form @submit.prevent="addNewTodo">
       <input v-model="newTodoText" placeholder="接下来要做什么？" />
       <button type="submit">添加</button>
     </form>
 
     <ul>
       <TodoItem
-        v-for="todo in todos"
+        v-for="todo in todoStore.todos"
         :key="todo.id"
         :todo="todo"
-        @remove="removeTodo(todo.id)"
-        @toggle-complete="toggleTodoComplete(todo.id)"
+        @remove="todoStore.removeTodo(todo.id)"
+        @toggle-complete="todoStore.toggleTodoComplete(todo.id)"
       />
     </ul>
   </main>

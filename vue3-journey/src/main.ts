@@ -3,13 +3,15 @@
 import "./assets/main.css";
 
 import { createApp } from "vue";
+import { createPinia } from "pinia"; // 导入 Pinia
 import App from "./App.vue";
-// 1. 导入我们创建的路由实例
-import router from "./router";
+import router from "./router"; // 导入 Router
 
 const app = createApp(App);
 
-// 2. 在挂载应用前，使用 .use() 方法来安装路由
+// 最佳实践：在挂载应用前，安装所有需要的插件。
+// Pinia 和 Vue Router 的安装顺序在这里通常不影响最终功能。
+app.use(createPinia());
 app.use(router);
 
 app.mount("#app");
