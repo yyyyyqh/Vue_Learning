@@ -1,23 +1,24 @@
 // src/stores/todoStore.ts
 
-import { ref, computed, watch } from "vue";
+import { computed } from "vue"; // ref 和 watch 不再需要从 vue 中直接导入了
 import { defineStore } from "pinia";
 
-// 使用 defineStore() 来定义一个 store
-// 第一个参数是 store 的唯一 ID，Pinia 用它来连接到开发者工具
+// 1. 导入我们自己创建的组合式函数
+import { useLocalStorage } from "../composables/useLocalStorage";
+
 export const useTodoStore = defineStore("todos", () => {
   // --- STATE ---
-  // state 是 store 的核心数据，这里我们用 ref() 来定义
-  const todos = ref(JSON.parse(localStorage.getItem("todos") || "[]"));
+  // 之前复杂的初始化和 watch 逻辑，现在被这一行优雅地取代了！
+  const todos = useLocalStorage("todos", []); // 'todos' 是 key, [] 是默认值
 
   // --- GETTERS ---
-  // getters 如同 store 的计算属性，可以派生出新的状态
+  // Getters 和 Actions 的代码完全不需要改变，因为它们操作的
+  // 依然是一个 ref (只不过这个 ref 是由我们的 Composable 创建的)
   const incompleteCount = computed(() => {
     return todos.value.filter((todo) => !todo.completed).length;
   });
 
   // --- ACTIONS ---
-  // actions 如同 store 的方法，用于修改 state
   function addTodo(text: string) {
     const trimmedText = text.trim();
     if (trimmedText === "") return;
@@ -41,17 +42,7 @@ export const useTodoStore = defineStore("todos", () => {
     }
   }
 
-  // --- Side Effects (e.g., localStorage) ---
-  // 我们可以直接在 store 内部使用 watch 来响应 state 的变化
-  watch(
-    todos,
-    (newTodos) => {
-      localStorage.setItem("todos", JSON.stringify(newTodos));
-    },
-    { deep: true }
-  );
-
-  // 最后，必须返回所有需要暴露给组件的 state, getters 和 actions
+  // 返回所有需要暴露出去的状态和方法
   return {
     todos,
     incompleteCount,
