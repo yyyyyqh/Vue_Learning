@@ -2,20 +2,15 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { Plus } from "@element-plus/icons-vue"; // 导入一个图标
 import TodoItem from "../components/TodoItem.vue";
-// 1. 导入我们刚刚创建的 store
 import { useTodoStore } from "../stores/todoStore";
 
-// 2. 在组件中激活 store
 const todoStore = useTodoStore();
-
-// 3. 输入框的文本是这个组件独有的临时状态，所以保留在组件本地
 const newTodoText = ref("");
 
-// 4. 创建一个新函数来调用 store 里的 action
 function addNewTodo() {
   todoStore.addTodo(newTodoText.value);
-  // 清空本地的 ref
   newTodoText.value = "";
 }
 </script>
@@ -24,10 +19,18 @@ function addNewTodo() {
   <main>
     <h1>我的待办事项 (还剩 {{ todoStore.incompleteCount }} 项未完成)</h1>
 
-    <form @submit.prevent="addNewTodo">
-      <input v-model="newTodoText" placeholder="接下来要做什么？" />
-      <button type="submit">添加</button>
-    </form>
+    <div class="add-form">
+      <el-input
+        v-model="newTodoText"
+        placeholder="接下来要做什么？"
+        size="large"
+        clearable
+        @keyup.enter="addNewTodo"
+      />
+      <el-button type="primary" size="large" :icon="Plus" @click="addNewTodo">
+        添加
+      </el-button>
+    </div>
 
     <ul>
       <TodoItem

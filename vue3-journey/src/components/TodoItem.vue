@@ -1,54 +1,64 @@
+// src/components/TodoItem.vue
+
 <script setup lang="ts">
-// 更新 Props，现在 todo 对象包含一个 `completed` 属性
+import { RouterLink } from "vue-router";
+// 导入需要的图标
+import { Delete } from "@element-plus/icons-vue";
+
 defineProps<{
   todo: {
     id: number;
     text: string;
-    completed: boolean; // 新增
+    completed: boolean;
   };
 }>();
 
-// 新增一个 `toggle-complete` 事件
 const emit = defineEmits(["remove", "toggle-complete"]);
 </script>
 
 <template>
-  <li :class="{ completed: todo.completed }">
-    <input
-      type="checkbox"
-      :checked="todo.completed"
-      @change="emit('toggle-complete')"
-    />
-
-    <RouterLink :to="`/todo/${todo.id}`">
-      <span>{{ todo.text }}</span>
-    </RouterLink>
-    <button @click="emit('remove')">删除</button>
-  </li>
+  <el-card class="todo-item" :class="{ completed: todo.completed }">
+    <div class="todo-content">
+      <el-checkbox
+        :model-value="todo.completed"
+        @change="emit('toggle-complete')"
+        size="large"
+      />
+      <RouterLink :to="`/todo/${todo.id}`" class="todo-text">
+        <span>{{ todo.text }}</span>
+      </RouterLink>
+    </div>
+    <el-button type="danger" :icon="Delete" circle @click="emit('remove')" />
+  </el-card>
 </template>
 
 <style scoped>
-li {
+.todo-item {
+  margin-bottom: 10px;
+}
+
+/* 自定义卡片内部的样式 */
+/* el-card 的样式可以通过 :deep() 选择器进行深度修改 */
+:deep(.el-card__body) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
 }
 
-/* 新增样式：当 li 元素有 'completed' class 时，应用删除线样式 */
-li.completed span {
+.todo-content {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* 复选框和文字的间距 */
+}
+
+.todo-text {
+  text-decoration: none;
+  color: inherit; /* 继承父元素颜色 */
+  font-size: 1.1rem;
+}
+
+.completed .todo-text {
   text-decoration: line-through;
-  color: #ccc;
-}
-
-button {
-  background-color: #ff4d4d;
-  /* ... 其他样式保持不变 ... */
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
+  color: #a8a5a5;
 }
 </style>
